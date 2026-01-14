@@ -1,41 +1,82 @@
 local Config = lib.load('config')
 
-local Objects, Particles, Heist = {}, {}, {}
+local Objects, Particles, Heist, Doors = {}, {}, {}, {}
 
 local GasPoints = {
-    { Light = vec3(3833.42, 3665.39, -22.11), Vertical = false, Pos = vec3(-0.645, -0.03, 0.90), Axis = {0.215, 0.92} },
-    { Light = vec3(3833.20, 3665.51, -22.11), Vertical = false, Pos = vec3(-0.375, -0.03, 0.90), Axis = {0.355, 0.92} },
-    { Light = vec3(3832.98, 3665.64, -22.11), Vertical = false, Pos = vec3(-0.125, -0.03, 0.90), Axis = {0.465, 0.92} },
-    { Light = vec3(3832.76, 3665.77, -22.11), Vertical = false, Pos = vec3(0.125, -0.03, 0.90), Axis = {0.59, 0.92} },
-    { Light = vec3(3832.54, 3665.90, -22.11), Vertical = false, Pos = vec3(0.375, -0.03, 0.90), Axis = {0.715, 0.92} },
-    { Light = vec3(3832.32, 3666.03, -22.11), Vertical = false, Pos = vec3(0.625, -0.03, 0.90), Axis = {0.83, 0.92} },
-    { Light = vec3(3833.57, 3665.35, -22.230), Vertical = true, Pos = vec3(-0.775, -0.03, 0.77), Axis = {0.145, 0.88} },
-    { Light = vec3(3833.57, 3665.35, -22.489), Vertical = true, Pos = vec3(-0.775, -0.03, 0.52), Axis = {0.145, 0.74} },
-    { Light = vec3(3833.57, 3665.35, -22.748), Vertical = true, Pos = vec3(-0.775, -0.03, 0.27), Axis = {0.145, 0.62} },
-    { Light = vec3(3833.57, 3665.35, -23.007), Vertical = true, Pos = vec3(-0.775, -0.03, 0.02), Axis = {0.145, 0.5} },
-    { Light = vec3(3833.57, 3665.35, -23.266), Vertical = true, Pos = vec3(-0.775, -0.03, -0.25), Axis = {0.145, 0.375} },
-    { Light = vec3(3833.57, 3665.35, -23.525), Vertical = true, Pos = vec3(-0.775, -0.03, -0.52), Axis = {0.145, 0.24} },
-    { Light = vec3(3833.57, 3665.35, -23.784), Vertical = true, Pos = vec3(-0.775, -0.03, -0.77), Axis = {0.145, 0.12} },
-    { Light = vec3(3833.42, 3665.39, -23.900), Vertical = false, Pos = vec3(-0.645, -0.03, -0.90), Axis = {0.215, 0.065} },
-    { Light = vec3(3833.20, 3665.51, -23.900), Vertical = false, Pos = vec3(-0.375, -0.03, -0.90), Axis = {0.355, 0.065} },
-    { Light = vec3(3832.98, 3665.64, -23.900), Vertical = false, Pos = vec3(-0.125, -0.03, -0.90), Axis = {0.465, 0.065} },
-    { Light = vec3(3832.76, 3665.77, -23.900), Vertical = false, Pos = vec3(0.125, -0.03, -0.90), Axis = {0.59, 0.065} },
-    { Light = vec3(3832.54, 3665.90, -23.900), Vertical = false, Pos = vec3(0.375, -0.03, -0.90), Axis = {0.715, 0.065} },
-    { Light = vec3(3832.32, 3666.03, -23.900), Vertical = false, Pos = vec3(0.625, -0.03, -0.90), Axis = {0.83, 0.065} },
-    { Light = vec3(3832.21, 3666.14, -22.230), Vertical = true, Pos = vec3(0.775, -0.03, 0.77), Axis = {0.895, 0.88} },
-    { Light = vec3(3832.21, 3666.14, -22.489), Vertical = true, Pos = vec3(0.775, -0.03, 0.52), Axis = {0.895, 0.74} },
-    { Light = vec3(3832.21, 3666.14, -22.748), Vertical = true, Pos = vec3(0.775, -0.03, 0.27), Axis = {0.895, 0.62} },
-    { Light = vec3(3832.21, 3666.14, -23.007), Vertical = true, Pos = vec3(0.775, -0.03, 0.02), Axis = {0.895, 0.5} },
-    { Light = vec3(3832.21, 3666.14, -23.266), Vertical = true, Pos = vec3(0.775, -0.03, -0.25), Axis = {0.895, 0.375} },
-    { Light = vec3(3832.21, 3666.14, -23.525), Vertical = true, Pos = vec3(0.775, -0.03, -0.52), Axis = {0.895, 0.24} },
-    { Light = vec3(3832.21, 3666.14, -23.784), Vertical = true, Pos = vec3(0.775, -0.03, -0.77), Axis = {0.895, 0.12} },
+    { Light = vec3(3833.42, 3665.39, -22.11), Vertical = false, Offset = vec3(-0.645, -0.03, 0.90), Axis = {0.215, 0.92} },
+    { Light = vec3(3833.20, 3665.51, -22.11), Vertical = false, Offset = vec3(-0.375, -0.03, 0.90), Axis = {0.355, 0.92} },
+    { Light = vec3(3832.98, 3665.64, -22.11), Vertical = false, Offset = vec3(-0.125, -0.03, 0.90), Axis = {0.465, 0.92} },
+    { Light = vec3(3832.76, 3665.77, -22.11), Vertical = false, Offset = vec3(0.125, -0.03, 0.90), Axis = {0.59, 0.92} },
+    { Light = vec3(3832.54, 3665.90, -22.11), Vertical = false, Offset = vec3(0.375, -0.03, 0.90), Axis = {0.715, 0.92} },
+    { Light = vec3(3832.32, 3666.03, -22.11), Vertical = false, Offset = vec3(0.625, -0.03, 0.90), Axis = {0.83, 0.92} },
+    { Light = vec3(3833.57, 3665.35, -22.230), Vertical = true, Offset = vec3(-0.775, -0.03, 0.77), Axis = {0.145, 0.88} },
+    { Light = vec3(3833.57, 3665.35, -22.489), Vertical = true, Offset = vec3(-0.775, -0.03, 0.52), Axis = {0.145, 0.74} },
+    { Light = vec3(3833.57, 3665.35, -22.748), Vertical = true, Offset = vec3(-0.775, -0.03, 0.27), Axis = {0.145, 0.62} },
+    { Light = vec3(3833.57, 3665.35, -23.007), Vertical = true, Offset = vec3(-0.775, -0.03, 0.02), Axis = {0.145, 0.5} },
+    { Light = vec3(3833.57, 3665.35, -23.266), Vertical = true, Offset = vec3(-0.775, -0.03, -0.25), Axis = {0.145, 0.375} },
+    { Light = vec3(3833.57, 3665.35, -23.525), Vertical = true, Offset = vec3(-0.775, -0.03, -0.52), Axis = {0.145, 0.24} },
+    { Light = vec3(3833.57, 3665.35, -23.784), Vertical = true, Offset = vec3(-0.775, -0.03, -0.77), Axis = {0.145, 0.12} },
+    { Light = vec3(3833.42, 3665.39, -23.900), Vertical = false, Offset = vec3(-0.645, -0.03, -0.90), Axis = {0.215, 0.065} },
+    { Light = vec3(3833.20, 3665.51, -23.900), Vertical = false, Offset = vec3(-0.375, -0.03, -0.90), Axis = {0.355, 0.065} },
+    { Light = vec3(3832.98, 3665.64, -23.900), Vertical = false, Offset = vec3(-0.125, -0.03, -0.90), Axis = {0.465, 0.065} },
+    { Light = vec3(3832.76, 3665.77, -23.900), Vertical = false, Offset = vec3(0.125, -0.03, -0.90), Axis = {0.59, 0.065} },
+    { Light = vec3(3832.54, 3665.90, -23.900), Vertical = false, Offset = vec3(0.375, -0.03, -0.90), Axis = {0.715, 0.065} },
+    { Light = vec3(3832.32, 3666.03, -23.900), Vertical = false, Offset = vec3(0.625, -0.03, -0.90), Axis = {0.83, 0.065} },
+    { Light = vec3(3832.21, 3666.14, -22.230), Vertical = true, Offset = vec3(0.775, -0.03, 0.77), Axis = {0.895, 0.88} },
+    { Light = vec3(3832.21, 3666.14, -22.489), Vertical = true, Offset = vec3(0.775, -0.03, 0.52), Axis = {0.895, 0.74} },
+    { Light = vec3(3832.21, 3666.14, -22.748), Vertical = true, Offset = vec3(0.775, -0.03, 0.27), Axis = {0.895, 0.62} },
+    { Light = vec3(3832.21, 3666.14, -23.007), Vertical = true, Offset = vec3(0.775, -0.03, 0.02), Axis = {0.895, 0.5} },
+    { Light = vec3(3832.21, 3666.14, -23.266), Vertical = true, Offset = vec3(0.775, -0.03, -0.25), Axis = {0.895, 0.375} },
+    { Light = vec3(3832.21, 3666.14, -23.525), Vertical = true, Offset = vec3(0.775, -0.03, -0.52), Axis = {0.895, 0.24} },
+    { Light = vec3(3832.21, 3666.14, -23.784), Vertical = true, Offset = vec3(0.775, -0.03, -0.77), Axis = {0.895, 0.12} },
 }
 
-local function AlmostEqual(v1, v2, threshold)
-    return math.abs(v1 - v2) <= threshold
+local function AlmostEqual(V1, V2, Threshold) return math.abs(V1 - V2) <= Threshold end
+
+local function TakeChemical(Data)
+    local PlayerPed = cache.ped
+    local Dict = 'missfbi5ig_22'
+    local SceneOffset = vec3(-1.636963, 5.204346, -1.382074)
+    local Rotation = vec3(0.0, 0.0, 170.0)
+
+    local TubeProp = Data.entity
+    local VialProp = NetworkGetEntityFromNetworkId(Heist.Chemicals.Vial)
+
+    local ScenePos = GetEntityCoords(TubeProp) + SceneOffset
+
+    lib.requestAnimDict(Dict)
+
+    local TakeScene = NetworkCreateSynchronisedScene(ScenePos, Rotation, 2, true, true, -1, 0, 1.0)
+    NetworkAddPedToSynchronisedScene(PlayerPed, TakeScene, Dict, 'take_chemical_player0', 1.5, -4.0, 1, 16, 1148846080, 0)
+    NetworkAddEntityToSynchronisedScene(VialProp, TakeScene, Dict, 'take_chemical_tube', 1.0, 1.0, 1)
+    NetworkAddEntityToSynchronisedScene(TubeProp, TakeScene, Dict, 'take_chemical_vial', 1.0, 1.0, 1)
+
+    NetworkStartSynchronisedScene(TakeScene)
+
+    Wait(12766)
+
+    local Success, Error = lib.callback.await('mani-humaneheist:server:TakeChemical', false)
+    if not Success then lib.notify({ title = 'Fejl', description = Error, type = 'error' } ) return end
+
+    RemoveAnimDict(Dict)
 end
 
-local function MinigameLoop(var1, var2)
+local function ExitMinigame()
+    local PlayerPed = cache.ped
+
+    Heist.GrillLoop = false
+
+    ClearPedTasks(PlayerPed)
+    DeleteObject(Heist['GasTorch'])
+
+    for i = 1, #Particles do
+        StopParticleFxLooped(Particles[i], false)
+    end
+
+    TriggerServerEvent('mani-humaneheist:server:OpenGrill')
+end
+
+local function MinigameCheck(var1, var2)
     for i = 1, #GasPoints do
         local Point = GasPoints[i]
         if not Point.Cracked then
@@ -47,15 +88,15 @@ local function MinigameLoop(var1, var2)
                 Wait(2500)
                 StopParticleFxLooped(ParticleFX, false)
                 Point.Cracked = true
-                Heist.Count = (Heist.Count or 0) + 1
+                Heist.GrillCount = Heist.GrillCount + 1
 
                 UseParticleFxAssetNextCall('scr_fbi5a')
                 local Rotation = Point.Vertical and 0.0 or 90.0
-                Particles[i] = StartParticleFxLoopedOnEntity('scr_bio_grille_break', Heist['GrillBit'], Point.Pos, 0.0, Rotation, 0.0, 1.2, false, false, false)
+                local GrillBit = NetworkGetEntityFromNetworkId(Heist.Grill.Bit)
+                Particles[i] = StartParticleFxLoopedOnEntity('scr_bio_grille_break', GrillBit, Point.Offset, 0.0, Rotation, 0.0, 1.2, false, false, false)
 
-                if Heist.Count == #GasPoints then
-                    Heist.GrillLoop = false
-                    print('Done')
+                if Heist.GrillCount == #GasPoints then
+                    ExitMinigame()
                 end
             end
         end
@@ -63,10 +104,11 @@ local function MinigameLoop(var1, var2)
 end
 
 local function CutGrill()
+    local Success, Error = lib.callback.await('mani-humaneheist:server:CutGrill', false)
+    if not Success then lib.notify({ title = 'Fejl', description = Error, type = 'error' } ) return end
+
     local PlayerPed = cache.ped
     local PedCoords = GetEntityCoords(PlayerPed)
-
-    SetEntityHeading(PlayerPed, 150.0)
 
     SetPedResetFlag(PlayerPed, 197, true)
     SetPedCanLegIk(PlayerPed, false)
@@ -103,8 +145,6 @@ local function CutGrill()
         local X = 0.15
         local Y = 0.8
 
-        Heist.GrillLoop = true
-
         while Heist.GrillLoop do
             if IsControlPressed(0, 31) then
                 Y = Y - 0.005
@@ -121,8 +161,9 @@ local function CutGrill()
 
             Citizen.InvokeNative(0xD5BB4025AE449A4E, PlayerPed, 'x_axis', X)
             Citizen.InvokeNative(0xD5BB4025AE449A4E, PlayerPed, 'y_axis', Y)
-            MinigameLoop(X, Y)
-            
+
+            MinigameCheck(X, Y)
+
             Wait(1)
         end
 
@@ -137,34 +178,158 @@ local function CreateGrill()
     local GrillBitHash = GetHashKey('prop_chem_grill_bit')
     local GrillPos = vec4(3832.85, 3665.67, -23.0, 150.0)
 
-    local Grill = exports['mani-bridge']:CreateObj(GrillHash, GrillPos)
-    local GrillBit = exports['mani-bridge']:CreateObj(GrillBitHash, GrillPos)
+    local GrillEntity, Grill = exports['mani-bridge']:CreateObj(GrillHash, GrillPos)
+    local GrillBitEntity, GrillBit = exports['mani-bridge']:CreateObj(GrillBitHash, GrillPos)
 
-    Objects[#Objects + 1] = Grill
-    Objects[#Objects + 1] = GrillBit
-    Heist.GrillBit = GrillBit
+    Objects[#Objects + 1] = GrillEntity
+    Objects[#Objects + 1] = GrillBitEntity
 
-    FreezeEntityPosition(Grill, true)
-    FreezeEntityPosition(GrillBit, true)
+    FreezeEntityPosition(GrillEntity, true)
+    FreezeEntityPosition(GrillBitEntity, true)
 
-    return { Main = Grill, Bit = GrillBit }
+    return {
+        Main = Grill,
+        Bit = GrillBit
+    }
+end
+
+local function CreateReaders()
+    local Readers = {}
+
+    local ReaderModel = GetHashKey('m23_1_prop_m31_control_panel_01a')
+
+    for i = 1, #Config.Doors do
+        local Door = Config.Doors[i]
+        local DoorKey = Door.Key
+        local ReaderCoords = Door.Reader
+
+        if ReaderCoords then
+            local ReaderEntity, Reader = exports['mani-bridge']:CreateObj(ReaderModel, ReaderCoords)
+
+            Objects[#Objects + 1] = ReaderEntity
+            
+            Readers[#Readers+1] = { NetId = Reader, DoorKey = DoorKey }
+        end
+    end
+
+    return Readers
+end
+
+local function SetupReaders()
+    for i = 1, #Heist.Readers do
+        local ReaderData = Heist.Readers[i]
+        
+        exports['ox_target']:addEntity(ReaderData.NetId, {
+            label = 'Swipe Kortet',
+            name = 'humane_heist_reader_' .. ReaderData.DoorKey,
+            icon = 'fa-solid fa-id-card',
+            distance = 2.5,
+            items = Config.Card.ItemName,
+            onSelect = function(Data)
+                exports['mani-bridge']:CardSwipe(function()
+                    local Success, Error = lib.callback.await('mani-humaneheist:server:UseReader', false, ReaderData.DoorKey)
+                    if not Success then lib.notify({ title = 'Fejl', description = Error, type = 'error' } ) end
+                end, Data.entity)
+            end,
+        })
+    end
+end
+
+local function CreateChemicals()
+    local TubeModel = GetHashKey('p_chem_vial_02b_s')
+    local VialModel = GetHashKey('prop_cs_vial_01')
+    local PropPos = vec4(3560.52, 3672.68, 28.50, 170.0)
+
+    local TubeEntity, Tube = exports['mani-bridge']:CreateObj(TubeModel, PropPos)
+    local VialEntity, Vial = exports['mani-bridge']:CreateObj(VialModel, PropPos)
+
+    Objects[#Objects + 1] = TubeEntity
+    Objects[#Objects + 1] = VialEntity
+
+    FreezeEntityPosition(TubeEntity, true)
+    FreezeEntityPosition(VialEntity, true)
+
+    return {
+        Tube = Tube,
+        Vial = Vial
+    }
 end
 
 local function StartHeist()
     local Grills = CreateGrill()
+    local Readers = CreateReaders()
+    local Chemicals = CreateChemicals()
 
-    exports['ox_target']:addLocalEntity(Grills.Bit, {
-        label = 'Brug Gas Cutter',
-        name = 'humane_heist_grill_bit',
-        icon = 'fa-solid fa-scissors',
-        distance = 2.5,
-        onSelect = function()
-            CutGrill()
-        end,
+    TriggerServerEvent('mani-humaneheist:server:StartHeist', {
+        Grills = Grills,
+        Readers = Readers,
+        Chemicals = Chemicals
     })
 end
 
 CreateThread(StartHeist)
+
+RegisterNetEvent('mani-humaneheist:client:StartHeist', function(HeistData)
+    Heist = HeistData
+
+    exports['ox_target']:addEntity(Heist.Grill.Bit, {
+        label = 'Brug Gas Cutter',
+        name = 'humane_heist_grill_bit',
+        icon = 'fa-solid fa-scissors',
+        distance = 2.5,
+        onSelect = CutGrill,
+    })
+
+    SetupReaders()
+end)
+
+CreateThread(function()
+    for ConfigDoor = 1, #Config.Doors do
+        local Door = Config.Doors[ConfigDoor]
+        Doors[Door.Key] = {}
+        if Door.Double then
+            for DoorIndex = 1, #Door.Double do
+                local SubDoor = Door.Double[DoorIndex]
+                SubDoor.Hash = GetHashKey(('mani_humane_%s_%d'):format(Door.Key, DoorIndex))
+                AddDoorToSystem(SubDoor.Hash, SubDoor.Model, SubDoor.Coords.x, SubDoor.Coords.y, SubDoor.Coords.z, false, false, false)
+                DoorSystemSetDoorState(SubDoor.Hash, 1, false, false)
+                Doors[Door.Key][#Doors[Door.Key] + 1] = SubDoor.Hash
+            end
+        else
+            Door.Hash = GetHashKey(('mani_humane_%s'):format(Door.Key))
+            AddDoorToSystem(Door.Hash, Door.Model, Door.Coords.x, Door.Coords.y, Door.Coords.z, false, false, false)
+            DoorSystemSetDoorState(Door.Hash, 1, false, false)
+            Doors[Door.Key][1] = Door.Hash
+        end
+    end
+end)
+
+RegisterNetEvent('mani-humaneheist:client:SetupChemicals', function(HeistData)
+    Heist = HeistData
+
+    exports['ox_target']:addEntity(Heist.Chemicals.Tube, {
+        label = 'Tag Kemisk Tube',
+        name = 'humane_heist_chemical_tube',
+        icon = 'fa-solid fa-flask',
+        distance = 2.5,
+        onSelect = TakeChemical,
+    })
+end)
+
+RegisterNetEvent('mani-humaneheist:client:FinishHeist', function()
+    Heist = {}
+
+    lib.notify({ title = 'Succes', description = 'Heistet fuldført', type = 'success' } )
+end)
+
+RegisterNetEvent('mani-humaneheist:client:UpdateHeist', function(HeistData) Heist = HeistData end)
+
+RegisterNetEvent('mani-humaneheist:client:UnlockDoor', function(Key)
+    for i = 1, #Doors[Key] do
+        local DoorHash = Doors[Key][i]
+        DoorSystemSetDoorState(DoorHash, 0, false, false)
+    end
+end)
 
 AddEventHandler('onResourceStop', function(resourceName)
     if (GetCurrentResourceName() ~= resourceName) then return end
