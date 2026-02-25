@@ -1,5 +1,14 @@
 local Config = {}
 
+Config.Debug = true
+
+Config.MinPolice = 0
+
+Config.NPC = { -- Temp Heist NPC Indtil tablet/pc app.
+    Model = 'G_M_M_ChiGoon_02',
+    Coords = vec4(-546.80, -1805.50, 21.49, 61.46)
+}
+
 Config.Card = {
     Uses = 8,
     ItemName = 'humane_card'
@@ -7,7 +16,78 @@ Config.Card = {
 
 Config.Chemical = {
     Item = 'chem_vial',
-    Amount = { 5, 10 }
+    Amount = { 1, 1 }
+}
+
+Config.Guards = {
+    Locations = {
+        vec4(3527.44, 3693.46, 19.99, 12.76),
+        vec4(3523.61, 3681.16, 19.99, 358.42),
+        vec4(3522.37, 3688.93, 19.99, 257.39),
+        vec4(3532.30, 3674.30, 19.99, 168.23),
+        vec4(3526.76, 3673.63, 27.12, 259.34),
+        vec4(3532.07, 3664.75, 27.12, 81.84),
+        vec4(3528.49, 3660.12, 27.12, 327.97),
+        vec4(3534.66, 3645.66, 26.52, 349.06),
+        vec4(3540.63, 3667.15, 27.12, 130.50),
+        vec4(3538.11, 3659.72, 27.12, 48.65),
+        vec4(3550.11, 3657.90, 27.12, 168.61),
+        vec4(3553.03, 3656.44, 27.12, 84.39),
+        vec4(3555.03, 3661.43, 27.12, 76.89),
+        vec4(3551.15, 3664.96, 27.12, 166.77),
+        vec4(3561.15, 3679.02, 27.12, 79.65),
+        vec4(3555.17, 3681.04, 27.12, 186.51),
+        vec4(3559.71, 3665.59, 27.12, 79.98),
+        vec4(3561.09, 3684.85, 27.12, 175.39),
+        vec4(3567.50, 3682.37, 27.12, 78.56),
+        vec4(3568.13, 3701.73, 27.12, 168.57),
+        vec4(3563.10, 3690.27, 27.12, 265.00),
+        vec4(3585.75, 3691.60, 26.12, 83.85),
+        vec4(3584.74, 3683.25, 26.62, 336.67),
+        vec4(3591.32, 3677.14, 26.62, 7.42)
+    },
+    Weapons = {
+        'WEAPON_COMBATPDW',
+        'WEAPON_ASSAULTRIFLE_MK2',
+        'WEAPON_CARBINERIFLE_MK2'
+    },
+    Status = {
+        Health = 200,
+        Armor = 100,
+        Accuracy = 75
+    }
+}
+
+Config.Keypads = {
+    Amount = { 3, 4 },
+    Locations = {
+        vec4(3531.94, 3651.47, 27.95, -10.0),
+        vec4(3549.31, 3641.15, 28.46, -100.0),
+        vec4(3552.63, 3655.3410644531, 28.44, 170.0),
+        vec4(3562.98, 3680.11, 28.46, -10.0),
+        vec4(3562.11, 3687.3959960938, 28.44, 170.0),
+        vec4(3560.36, 3664.0883789062, 28.44, 170.0)
+    }
+}
+
+Config.Crates = {
+    Locations = {
+        vec4(3608.59, 3744.80, 27.6, -125.0),
+        vec4(3613.61, 3749.85, 27.69, -125.0),
+        vec4(3624.11, 3736.15, 27.69, 55.0),
+        vec4(3605.15, 3728.75, 28.68, -35.0)
+    },
+    Loot = { -- Must add up to 100% total
+        { Item = 'gold_bar', Amount = { 50, 100 }, Chance = 70 },
+        { Item = 'weapon_pistol', Amount = { 1, 1 }, Chance = 10 },
+        { Item = 'weapon_pistol50', Amount = { 1, 1 }, Chance = 5 },
+        { Item = 'weapon_pistolxm3', Amount = { 1, 1 }, Chance = 5 },
+        { Item = 'weapon_machinepistol', Amount = { 1, 1 }, Chance = 1 },
+        { Item = 'weapon_microsmg', Amount = { 1, 1 }, Chance = 1 },
+        { Item = 'weapon_minismg', Amount = { 1, 1 }, Chance = 1 },
+        { Item = 'armor', Amount = { 1, 5 }, Chance = 7 }
+    },
+    Amount = { 3, 4 }
 }
 
 Config.Doors = {
@@ -74,7 +154,7 @@ Config.Doors = {
         Reader = vec4(3555.648, 3664.61, 28.46, -10.0)
     },
     {
-        Key = 'labdoor5',
+        Key = 'main', -- main Door isn't unlockable through keycard.
         Model = 161378502,
         Coords = vec3(3557.5546875, 3669.1918945312, 27.119510650635),
         Reader = vec4(3557.3454589844, 3668.7624511719, 28.46, -100.0)

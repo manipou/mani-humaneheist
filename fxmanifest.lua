@@ -10,13 +10,13 @@ client_scripts {
 }
 
 server_scripts {
+    'open/server.lua',
     'server/*.lua'
 }
 
-shared_scripts {
-    '@ox_lib/init.lua',
-}
+shared_script '@jet-lib/init.lua'
 
 files {
     'config.lua',
+    'open/client.lua'
 }
