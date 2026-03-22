@@ -32,6 +32,8 @@ Config.Chemical = {
     Amount = { 1, 1 }
 }
 
+Config.HackingDevice = 'hacking_device'
+
 Config.Guards = {
     Locations = {
         vec4(3527.44, 3693.46, 19.99, 12.76),
@@ -167,7 +169,7 @@ Config.Doors = {
         Reader = vec4(3555.648, 3664.61, 28.46, -10.0)
     },
     {
-        Key = 'main', -- main Door isn't unlockable through keycard.
+        Key = 'main', -- main Door isn't unlockable before all keypads are hacked.
         Model = 161378502,
         Coords = vec3(3557.5546875, 3669.1918945312, 27.119510650635),
         Reader = vec4(3557.3454589844, 3668.7624511719, 28.46, -100.0)

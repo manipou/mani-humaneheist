@@ -50,7 +50,7 @@ CreateThread(function()
         MinPolice = Config.Police.Required,
         Requirements = {
             '1x Humane Labs Access Card',
-            '1x Hacking Device'
+            '1x ?Hacking Device'
         },
     })
 end)

@@ -469,6 +469,7 @@ RegisterNetEvent('mani-humaneheist:client:StartHeist', function(HeistData)
             label = 'Hack Garage',
             icon = 'fa-solid fa-laptop-code',
             distance = 2.5,
+            items = Config.HackingDevice,
             onSelect = function()
                 TriggerEvent('ox_inventory:disarm', true)
                 if exports['mani-minigames']:ColorShape({
