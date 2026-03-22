@@ -1,29 +1,68 @@
 local Config = require 'config'
 local Inventory = exports['ox_inventory']
 local Open = require 'open.server'
-local CrateItems = {}
 
-local Heist = {
-    Active = false,
-    State = 0,
-    Grill = {},
-    GrillLoop = true,
-    GrillCount = 0,
-    Readers = {},
-    Chemicals = {},
-    Keypads = {},
-    Crates = {},
-    HackedKeypads = 0
-}
+local Heist = {}
+
+---@type function | nil
+local CompleteContract = nil
+
+local function ResetHeist()
+    Heist = {
+        Active = false,
+        State = 0,
+        Grill = {},
+        GrillLoop = true,
+        GrillCount = 0,
+        Readers = {},
+        Chemicals = {},
+        Keypads = {},
+        HackedKeypads = 0
+    }
+end
+
+local function TeamAction(Source, Func)
+    local Team = exports['mani-contracts']:GetTeam(Source)
+    if Team then
+        Team:Run(Func)
+    else
+        Func({ Source = Source})
+    end
+end
+
+CreateThread(function()
+    ResetHeist()
+
+    if not Config.Contract.Enabled then return end
+    while GetResourceState('mani-contracts') ~= 'started' do Wait(5000) end
+
+    CompleteContract = exports['mani-contracts']:Register({
+        Label = Config.Contract.Label,
+        Description = Config.Contract.Description,
+        Image = Config.Contract.Image,
+        Export = 'StartHeist',
+        OneTime = true,
+        -- Cooldown = 3 * 60 * 60 * 1000,
+        RequiredLevel = Config.Contract.RequiredLevel,
+        Difficulty = 'Hard',
+        Limited = true,
+        XPReward = Config.Contract.XPReward,
+        MinPolice = Config.Police.Required,
+        Requirements = {
+            '1x Humane Labs Access Card',
+            '1x Hacking Device'
+        },
+    })
+end)
 
 Jet.Callback.Register('mani-humaneheist:server:UseReader', function(Source, DoorKey)
     local Search = Inventory:Search(Source, 'slots', Config.Card.ItemName)
     local Item = Search[1]
-    if not Item then return false, 'Du mangler et adgangskort' end
+    if not Item then return { Success = false, Message = 'Du mangler et adgangskort' } end
 
-    if Item.count > 1 then return false, 'Du har 2 adgangskort i hånden' end
+    if Item.count > 1 then return { Success = false, Message = 'Du har 2 adgangskort i hånden' } end
 
-    if DoorKey == 'main' and Heist.State ~= 3 then return false, 'Adgangskortet har ikke adgang hertil endnu' end
+    if DoorKey == 'main' and Heist.State ~= 3 then return { Success = false, Message = 'Adgangskortet har ikke adgang hertil endnu' } end
 
     local Durability = Item.metadata.durability or 100
     local NewDurability = Durability - (100 / Config.Card.Uses)
@@ -36,18 +75,19 @@ Jet.Callback.Register('mani-humaneheist:server:UseReader', function(Source, Door
 
     TriggerClientEvent('mani-humaneheist:client:UnlockDoor', -1, DoorKey)
 
-    return true
+    return { Success = true }
 end)
 
 Jet.Callback.Register('mani-humaneheist:server:CutGrill', function(Source)
-    if Heist.State < 1 then return false, 'Du kan ikke skære gitteret nu' end
+    if Heist.State < 1 then return { Success = false, Message = 'Du kan ikke skære gitteret nu' } end
     Heist.State = 2
 
-    exports['mani-bridge']:DoAction(Source, function(TeamSource)
-        TriggerClientEvent('mani-humaneheist:client:UpdateHeist', TeamSource, Heist)
+
+    TeamAction(Source, function(Member)
+        TriggerClientEvent('mani-humaneheist:client:UpdateHeist', Member.Source, Heist)
     end)
 
-    return true
+    return { Success = true }
 end)
 
 RegisterNetEvent('mani-humaneheist:server:OpenGrill', function ()
@@ -60,21 +100,21 @@ RegisterNetEvent('mani-humaneheist:server:OpenGrill', function ()
 
     Heist.GrillLoop = false
 
-    exports['mani-bridge']:DoAction(Source, function(TeamSource)
-        TriggerClientEvent('mani-humaneheist:client:SetupChemicals', TeamSource, Heist)
+    TeamAction(Source, function(Member)
+        TriggerClientEvent('mani-humaneheist:client:SetupChemicals', Member.Source, Heist)
     end)
 end)
 
 Jet.Callback.Register('mani-humaneheist:server:VerifyChemical', function(Source)
-    if Heist.State < 3 then return false, 'Du kan ikke tage kemikalier nu' end
+    if Heist.State < 3 then return { Success = false, Message = 'Du kan ikke tage kemikalier nu' } end
 
     Heist.State = 4
 
-    return true
+    return { Success = true }
 end)
 
 Jet.Callback.Register('mani-humaneheist:server:TakeChemical', function(Source)
-    if Heist.State < 4 then return false, 'Du kan ikke tage kemikalier nu' end
+    if Heist.State < 4 then return { Success = false, Message = 'Du kan ikke tage kemikalier nu' } end
     Heist.State = 5
 
     local VialProp = NetworkGetEntityFromNetworkId(Heist.Chemicals.Vial)
@@ -89,26 +129,22 @@ Jet.Callback.Register('mani-humaneheist:server:TakeChemical', function(Source)
     CreateThread(function()
         local PlayerPed = GetPlayerPed(Source)
         local PlayerCoords = GetEntityCoords(PlayerPed)
-        local HumaneCoords = vec3(3832.85, 3665.67, -23.0)
+        local HumaneCoords = vec3(3560.52, 3672.68, 28.50)
 
         local Distance = #(PlayerCoords - HumaneCoords)
 
-        -- TODO: TEST DISTANCE
+        if CompleteContract ~= nil then CompleteContract(Source, true) end
 
-        print(Distance)
-
-        while Distance < 200.0 do
+        while Distance < 400.0 do
             Wait(10000)
 
             PlayerPed = GetPlayerPed(Source)
             PlayerCoords = GetEntityCoords(PlayerPed)
             Distance = #(PlayerCoords - HumaneCoords)
-
-            print(Distance)
         end
 
-        exports['mani-bridge']:DoAction(Source, function(TeamSource)
-            TriggerClientEvent('mani-humaneheist:client:FinishHeist', TeamSource, Heist)
+        TeamAction(Source, function(Member)
+            TriggerClientEvent('mani-humaneheist:client:FinishHeist', Member.Source, Heist)
         end)
 
         DeleteEntity(NetworkGetEntityFromNetworkId(Heist.Grill.Bit))
@@ -124,36 +160,29 @@ Jet.Callback.Register('mani-humaneheist:server:TakeChemical', function(Source)
             DeleteEntity(NetworkGetEntityFromNetworkId(Heist.Keypads[i].NetId))
         end
 
-        Heist = {}
+        ResetHeist()
     end)
 
-    return true
+    return { Success = true }
 end)
 
 RegisterNetEvent('mani-humaneheist:server:OpenExit', function()
     TriggerClientEvent('mani-humaneheist:client:UnlockDoor', -1, 'exit')
 end)
 
-Jet.Callback.Register('mani-humaneheist:server:HeistData', function(Source)
-    local PoliceCount = exports['mani-bridge']:GetJobCount('police')
-
-    if Heist.Active then return false, 'Det er for sent.' end
-    if PoliceCount < Config.MinPolice then return false, 'Der er ikke nok politi.' end
-
-    return true
-end)
-
 Jet.Callback.Register('mani-humaneheist:server:HeistDistance', function(Source)
-    if Heist.Active then return false end
+    if Heist.Active then return { Success = false, Message = 'Heist er allerede aktivt' } end
     Heist.Active = true
+
+    local PoliceCount = Jet.GetJobCount(Config.Police.Job)
+    if PoliceCount < Config.Police.Required then return { Success = false, Message = 'Der er ikke nok politi.' } end
 
     local TeamMembers = {}
     local HumaneCoords = vec3(3832.85, 3665.67, -23.0)
 
-    exports['mani-bridge']:DoAction(Source, function(TeamSource)
-        print(TeamSource)
-        TeamMembers[#TeamMembers + 1] = TeamSource
-        TriggerClientEvent('mani-humaneheist:client:SetupBlip', TeamSource)
+    TeamAction(Source, function(Member)
+        TeamMembers[#TeamMembers + 1] = Member.Source
+        TriggerClientEvent('mani-humaneheist:client:SetupBlip', Member.Source)
     end)
 
     CreateThread(function()
@@ -177,12 +206,11 @@ Jet.Callback.Register('mani-humaneheist:server:HeistDistance', function(Source)
                     Heist.Readers = Data.Readers
                     Heist.Chemicals = Data.Chemicals
                     Heist.Keypads = Data.Keypads
-                    Heist.Crates = Data.Crates
 
                     Open.Log(Source, 'Started Humane Heist')
 
-                    for i = 1, #TeamMembers do
-                        local MemberSource = TeamMembers[i]
+                    for MemberIndex = 1, #TeamMembers do
+                        local MemberSource = TeamMembers[MemberIndex]
                         TriggerClientEvent('mani-humaneheist:client:StartHeist', MemberSource, Heist)
                     end
 
@@ -194,14 +222,14 @@ Jet.Callback.Register('mani-humaneheist:server:HeistDistance', function(Source)
         end
     end)
 
-    return true
+    return { Success = true }
 end)
 
 Jet.Callback.Register('mani-humaneheist:server:HackKeypad', function(Source, Index)
     local Keypad = Heist.Keypads[Index]
-    if not Keypad then return false, 'Nøglepanelet findes ikke' end
+    if not Keypad then return { Success = false, Message = 'Nøglepanelet findes ikke' } end
 
-    if Keypad.Hacked then return false, 'Nøglepanelet er allerede hackede' end
+    if Keypad.Hacked then return { Success = false, Message = 'Nøglepanelet er allerede hackede' } end
     Keypad.Hacked = true
 
     local LastKeypad
@@ -212,18 +240,9 @@ Jet.Callback.Register('mani-humaneheist:server:HackKeypad', function(Source, Ind
         LastKeypad = true
     end
 
-    exports['mani-bridge']:DoAction(Source, function(TeamSource)
-        TriggerClientEvent('mani-humaneheist:client:HackKeypad', TeamSource, Heist, Index)
+    TeamAction(Source, function(Member)
+        TriggerClientEvent('mani-humaneheist:client:HackKeypad', Member.Source, Heist, Index)
     end)
 
-    return true, nil, LastKeypad
-end)
-
-CreateThread(function()
-    for i = 1, #Config.Crates.Items do
-        local Item = Config.Crates.Items[i]
-        for j = 1, Item.Chance do
-            CrateItems[#CrateItems + 1] = i
-        end
-    end
+    return { Success = true, LastKeypad = LastKeypad }
 end)

@@ -10,7 +10,6 @@ client_scripts {
 }
 
 server_scripts {
-    'open/server.lua',
     'server/*.lua'
 }
 

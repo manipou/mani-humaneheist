@@ -1,7 +1,6 @@
 local Open = {}
 
 function Open.Dispatch()
-    local PlayerPed = cache.ped
     local DispatchCoords = vec3(3539.90, 3739.68, 35.68)
     exports['tk_dispatch']:addCall({
         title = 'Humane Labs Indbrud',

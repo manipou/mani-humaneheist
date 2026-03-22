@@ -1,8 +1,21 @@
 local Config = {}
 
-Config.Debug = true
+Config.Debug = false
 
-Config.MinPolice = 0
+Config.Contract = {
+    Enabled = true,
+    Label = 'Humane Heist',
+    Description = 'Infiltrate the Humane Labs facility and extract classified vial research data. Requires stealth and coordination.',
+    Image = 'https://r2.fivemanage.com/WmVydXgpgFklWNec1F7Gy/vrC1C5N.jpg',
+    RequiredLevel = 1,
+    XPReward = 150
+}
+
+Config.Police = {
+    Job = 'police',
+    Dispatch = true,
+    Required = 0
+}
 
 Config.NPC = { -- Temp Heist NPC Indtil tablet/pc app.
     Model = 'G_M_M_ChiGoon_02',
@@ -59,7 +72,7 @@ Config.Guards = {
 }
 
 Config.Keypads = {
-    Amount = { 3, 4 },
+    Amount = { 1, 1 },
     Locations = {
         vec4(3531.94, 3651.47, 27.95, -10.0),
         vec4(3549.31, 3641.15, 28.46, -100.0),
@@ -70,25 +83,25 @@ Config.Keypads = {
     }
 }
 
-Config.Crates = {
-    Locations = {
-        vec4(3608.59, 3744.80, 27.6, -125.0),
-        vec4(3613.61, 3749.85, 27.69, -125.0),
-        vec4(3624.11, 3736.15, 27.69, 55.0),
-        vec4(3605.15, 3728.75, 28.68, -35.0)
-    },
-    Loot = { -- Must add up to 100% total
-        { Item = 'gold_bar', Amount = { 50, 100 }, Chance = 70 },
-        { Item = 'weapon_pistol', Amount = { 1, 1 }, Chance = 10 },
-        { Item = 'weapon_pistol50', Amount = { 1, 1 }, Chance = 5 },
-        { Item = 'weapon_pistolxm3', Amount = { 1, 1 }, Chance = 5 },
-        { Item = 'weapon_machinepistol', Amount = { 1, 1 }, Chance = 1 },
-        { Item = 'weapon_microsmg', Amount = { 1, 1 }, Chance = 1 },
-        { Item = 'weapon_minismg', Amount = { 1, 1 }, Chance = 1 },
-        { Item = 'armor', Amount = { 1, 5 }, Chance = 7 }
-    },
-    Amount = { 3, 4 }
-}
+-- Config.Crates = {
+--     Locations = {
+--         vec4(3608.59, 3744.80, 27.6, -125.0),
+--         vec4(3613.61, 3749.85, 27.69, -125.0),
+--         vec4(3624.11, 3736.15, 27.69, 55.0),
+--         vec4(3605.15, 3728.75, 28.68, -35.0)
+--     },
+--     Loot = { -- Must add up to 100% total
+--         { Item = 'gold_bar', Amount = { 50, 100 }, Chance = 70 },
+--         { Item = 'weapon_pistol', Amount = { 1, 1 }, Chance = 10 },
+--         { Item = 'weapon_pistol50', Amount = { 1, 1 }, Chance = 5 },
+--         { Item = 'weapon_pistolxm3', Amount = { 1, 1 }, Chance = 5 },
+--         { Item = 'weapon_machinepistol', Amount = { 1, 1 }, Chance = 1 },
+--         { Item = 'weapon_microsmg', Amount = { 1, 1 }, Chance = 1 },
+--         { Item = 'weapon_minismg', Amount = { 1, 1 }, Chance = 1 },
+--         { Item = 'armor', Amount = { 1, 5 }, Chance = 7 }
+--     },
+--     Amount = { 3, 4 }
+-- }
 
 Config.Doors = {
     {

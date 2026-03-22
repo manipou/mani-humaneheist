@@ -50,8 +50,8 @@ local function CreateBlip(Data)
 end
 
 local function TakeChemical(Data)
-    local Success, Error = Jet.Callback.Await('mani-humaneheist:server:VerifyChemical', false)
-    if not Success then Jet.Notify({ title = 'Fejl', description = Error, type = 'error' } ) return end
+    local Response = Jet.Callback.Await('mani-humaneheist:server:VerifyChemical', false)
+    if not Response.Success then Jet.Notify({ title = 'Fejl', description = Response.Message, type = 'error' } ) return end
 
     local PlayerPed = cache.ped
     local Dict = 'missfbi5ig_22'
@@ -65,7 +65,7 @@ local function TakeChemical(Data)
 
     Jet.Request.AnimDict(Dict)
 
-    local TakeScene = NetworkCreateSynchronisedScene(ScenePos, Rotation, 2, true, true, -1, 0, 1.0)
+    local TakeScene = NetworkCreateSynchronisedScene(ScenePos.x, ScenePos.y, ScenePos.z, Rotation.x, Rotation.y, Rotation.z, 2, true, true, -1, 0, 1.0)
     NetworkAddPedToSynchronisedScene(PlayerPed, TakeScene, Dict, 'take_chemical_player0', 1.5, -4.0, 1, 16, 1148846080, 0)
     NetworkAddEntityToSynchronisedScene(VialProp, TakeScene, Dict, 'take_chemical_tube', 1.0, 1.0, 1)
     NetworkAddEntityToSynchronisedScene(TubeProp, TakeScene, Dict, 'take_chemical_vial', 1.0, 1.0, 1)
@@ -76,8 +76,8 @@ local function TakeChemical(Data)
     
     RemoveAnimDict(Dict)
 
-    Success, Error = Jet.Callback.Await('mani-humaneheist:server:TakeChemical', false)
-    if not Success then Jet.Notify({ title = 'Fejl', description = Error, type = 'error' } ) return end
+    Response = Jet.Callback.Await('mani-humaneheist:server:TakeChemical', false)
+    if not Response.Success then Jet.Notify({ title = 'Fejl', description = Response.Message, type = 'error' } )  end
 end
 
 local function ExitMinigame()
@@ -97,13 +97,13 @@ local function ExitMinigame()
     TriggerServerEvent('mani-humaneheist:server:OpenGrill')
 end
 
-local function MinigameCheck(var1, var2)
+local function MinigameCheck(Axis1, Axis2)
     for i = 1, #GasPoints do
         local Point = GasPoints[i]
         if not Point.Cracked then
             DrawLightWithRange(Point.Light.x, Point.Light.y, Point.Light.z, 0, 255, 0, 0.03, 100.0)
 
-            if AlmostEqual(var1, Point.Axis[1], 0.025) and AlmostEqual(var2, Point.Axis[2], 0.025) then
+            if AlmostEqual(Axis1, Point.Axis[1], 0.025) and AlmostEqual(Axis2, Point.Axis[2], 0.025) then
                 UseParticleFxAssetNextCall('scr_fbi5a')
                 local ParticleFX = StartParticleFxLoopedOnEntity('scr_bio_grille_cutting', Heist['GasTorch'], -0.344, 0.0, 0.093, 0.0, 0.0, 0.0, 1.0, false, false, false)
                 Wait(Config.Debug and 100 or 2500)
@@ -114,7 +114,7 @@ local function MinigameCheck(var1, var2)
                 UseParticleFxAssetNextCall('scr_fbi5a')
                 local Rotation = Point.Vertical and 0.0 or 90.0
                 local GrillBit = NetworkGetEntityFromNetworkId(Heist.Grill.Bit)
-                Particles[i] = StartParticleFxLoopedOnEntity('scr_bio_grille_break', GrillBit, Point.Offset, 0.0, Rotation, 0.0, 1.2, false, false, false)
+                Particles[i] = StartParticleFxLoopedOnEntity('scr_bio_grille_break', GrillBit, Point.Offset.x, Point.Offset.y, Point.Offset.z, Rotation, 0.0, 0.0, 1.2, false, false, false)
 
                 if Heist.GrillCount == #GasPoints then
                     ExitMinigame()
@@ -125,8 +125,8 @@ local function MinigameCheck(var1, var2)
 end
 
 local function CutGrill()
-    local Success, Error = Jet.Callback.Await('mani-humaneheist:server:CutGrill', false)
-    if not Success then Jet.Notify({ title = 'Fejl', description = Error, type = 'error' } ) return end
+    local Response = Jet.Callback.Await('mani-humaneheist:server:CutGrill', false)
+    if not Response.Success then Jet.Notify({ title = 'Fejl', description = Response.Message, type = 'error' } ) return end
 
     local PlayerPed = cache.ped
     local PedCoords = GetEntityCoords(PlayerPed)
@@ -143,7 +143,7 @@ local function CutGrill()
     TaskMoveNetworkAdvancedByName(PlayerPed, 'minigame_BLOWTORCH', 3832.896, 3665.742, -23.9975, 0.0, 0.0, 150.0, 2, 0.0, false, 0, 0)
     ForcePedAiAndAnimationUpdate(PlayerPed, false, false)
 
-    local GasTorch = exports['mani-bridge']:CreateObj(GasTorchHash, PedCoords)
+    local GasTorch = Jet.Create.Prop(GasTorchHash, PedCoords)
     AttachEntityToEntity(GasTorch, PlayerPed, GetPedBoneIndex(PlayerPed, 28422), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, false, false, false, 2, true)
 
     Objects[#Objects + 1] = GasTorch
@@ -199,8 +199,8 @@ local function CreateGrill()
     local GrillBitHash = GetHashKey('prop_chem_grill_bit')
     local GrillPos = vec4(3832.85, 3665.67, -23.0, 150.0)
 
-    local GrillEntity, Grill = exports['mani-bridge']:CreateObj(GrillHash, GrillPos)
-    local GrillBitEntity, GrillBit = exports['mani-bridge']:CreateObj(GrillBitHash, GrillPos)
+    local GrillEntity, Grill = Jet.Create.Prop(GrillHash, GrillPos)
+    local GrillBitEntity, GrillBit = Jet.Create.Prop(GrillBitHash, GrillPos)
 
     Objects[#Objects + 1] = GrillEntity
     Objects[#Objects + 1] = GrillBitEntity
@@ -225,10 +225,10 @@ local function CreateReaders()
         local ReaderCoords = Door.Reader
 
         if ReaderCoords then
-            local ReaderEntity, Reader = exports['mani-bridge']:CreateObj(ReaderModel, ReaderCoords)
+            local ReaderEntity, Reader = Jet.Create.Prop(ReaderModel, ReaderCoords)
 
             Objects[#Objects + 1] = ReaderEntity
-            
+
             Readers[#Readers+1] = { NetId = Reader, DoorKey = DoorKey }
         end
     end
@@ -239,7 +239,7 @@ end
 local function SetupReaders()
     for i = 1, #Heist.Readers do
         local ReaderData = Heist.Readers[i]
-        
+
         Target:addEntity(ReaderData.NetId, {
             label = 'Swipe Kortet',
             name = 'humane_heist_reader_' .. ReaderData.DoorKey,
@@ -248,9 +248,9 @@ local function SetupReaders()
             items = Config.Card.ItemName,
             onSelect = function(Data)
                 TriggerEvent('ox_inventory:disarm', true)
-                exports['mani-bridge']:CardSwipe(function()
-                    local Success, Error = Jet.Callback.Await('mani-humaneheist:server:UseReader', false, ReaderData.DoorKey)
-                    if not Success then Jet.Notify({ title = 'Fejl', description = Error, type = 'error' } ) end
+                Jet.Scenes.CardSwipe(function()
+                    local Response = Jet.Callback.Await('mani-humaneheist:server:UseReader', false, ReaderData.DoorKey)
+                    if not Response.Success then Jet.Notify({ title = 'Fejl', description = Response.Message, type = 'error' } ) end
                 end, Data.entity)
             end,
         })
@@ -262,12 +262,12 @@ local function SetupKeypads()
         local KeypadData = Heist.Keypads[i]
 
         local Blip = CreateBlip({ Coords = Config.Keypads.Locations[KeypadData.Coords], Label = 'Keypad', Sprite = 619, Color = 1, Scale = 0.5, ShortRange = false })
-        
+
         Blips.Keypads[i] = Blip
 
         Target:addEntity(KeypadData.NetId, {
             label = 'Hack Keypad',
-            name = 'humane_heist_keypad_' .. i,
+            name = ('humane_heist_keypad_%d'):format(i),
             icon = 'fa-solid fa-keyboard',
             distance = 2.5,
             canInteract = function()
@@ -275,14 +275,14 @@ local function SetupKeypads()
             end,
             onSelect = function(Data)
                 TriggerEvent('ox_inventory:disarm', true)
-                exports['mani-bridge']:HackUSB(function()
+                Jet.Scenes.HackUSB(function()
                     if exports['mani-minigames']:Untangle({
                         Timer = 20,
                         Dots = 9
                     }) then
-                        local Success, Error, LastKeypad = Jet.Callback.Await('mani-humaneheist:server:HackKeypad', false, i)
-                        if not Success then Jet.Notify({ title = 'Fejl', description = Error, type = 'error' } ) return end
-                        if LastKeypad then Jet.Notify({ title = 'Succes', description = 'Alle keypads er hacket.', type = 'success' } ) return end
+                        local Response = Jet.Callback.Await('mani-humaneheist:server:HackKeypad', false, i)
+                        if not Response.Success then Jet.Notify({ title = 'Fejl', description = Response.Message, type = 'error' } ) return end
+                        if Response.LastKeypad then Jet.Notify({ title = 'Succes', description = 'Alle keypads er hacket.', type = 'success' } ) return end
                     end
                 end, Data.entity)
             end
@@ -305,7 +305,7 @@ local function CreateKeypads()
         end
         ChosenCoords[Location] = true
 
-        local KeypadEntity, KeypadNetid = exports['mani-bridge']:CreateObj(KeypadModel, Config.Keypads.Locations[Location])
+        local KeypadEntity, KeypadNetid = Jet.Create.Prop(KeypadModel, Config.Keypads.Locations[Location])
 
         Objects[#Objects + 1] = KeypadEntity
 
@@ -327,7 +327,7 @@ local function SetupGuards()
 
     for i = 1, #Config.Guards.Locations do
         local GuardPos = Config.Guards.Locations[i]
-        local Ped = exports['mani-bridge']:CreateNPC(GetHashKey('U_M_M_JewelSec_01'), GuardPos)
+        local Ped = Jet.Create.Ped(GetHashKey('U_M_M_JewelSec_01'), GuardPos)
 
         Objects[#Objects + 1] = Ped
 
@@ -340,7 +340,7 @@ local function SetupGuards()
         SetPedCombatMovement(Ped, 2)
         SetPedCombatRange(Ped, 2)
         SetPedAlertness(Ped, 3)
-        
+
         GiveWeaponToPed(Ped, GetHashKey(Config.Guards.Weapons[math.random(1, #Config.Guards.Weapons)]), 9999, false, false)
 
         SetPedRelationshipGroupHash(Ped, GuardGroup)
@@ -356,8 +356,8 @@ local function CreateChemicals()
     local TubePos = vec4(3560.52, 3672.68, 28.50, 272.40521240234)
     local VialPos = vec4(3560.486816, 3672.732422, 28.276993, 271.98004150391)
 
-    local TubeEntity, Tube = exports['mani-bridge']:CreateObj(TubeModel, TubePos)
-    local VialEntity, Vial = exports['mani-bridge']:CreateObj(VialModel, VialPos)
+    local TubeEntity, Tube = Jet.Create.Prop(TubeModel, TubePos)
+    local VialEntity, Vial = Jet.Create.Prop(VialModel, VialPos)
 
     Objects[#Objects + 1] = TubeEntity
     Objects[#Objects + 1] = VialEntity
@@ -371,74 +371,73 @@ local function CreateChemicals()
     }
 end
 
-local function CreateCrates()
-    local CrateModel = GetHashKey('xm3_prop_xm3_crate_01a')
-    local Crates = {}
+-- local function CreateCrates()
+--     local CrateModel = GetHashKey('xm3_prop_xm3_crate_01a')
+--     local Crates = {}
 
-    local Amount = math.random(Config.Crates.Amount[1], Config.Crates.Amount[2])
+--     local Amount = math.random(Config.Crates.Amount[1], Config.Crates.Amount[2])
 
-    local ChosenCoords = {}
+--     local ChosenCoords = {}
 
-    for i = 1, Amount do
-        local Location = math.random(1, #Config.Crates.Locations)
-        while ChosenCoords[Location] do
-            Location = math.random(1, #Config.Crates.Locations)
-        end
-        ChosenCoords[Location] = true
+--     for i = 1, Amount do
+--         local Location = math.random(1, #Config.Crates.Locations)
+--         while ChosenCoords[Location] do
+--             Location = math.random(1, #Config.Crates.Locations)
+--         end
+--         ChosenCoords[Location] = true
 
-        local CrateEntity, CrateNetid = exports['mani-bridge']:CreateObj(CrateModel, Config.Crates.Locations[Location])
+--         local CrateEntity, CrateNetid = Jet.Create.Prop(CrateModel, Config.Crates.Locations[Location])
 
-        Objects[#Objects + 1] = CrateEntity
+--         Objects[#Objects + 1] = CrateEntity
 
-        Crates[#Crates + 1] = {
-            Coords = Location,
-            NetId = CrateNetid,
-            Opened = false
-        }
-    end
+--         Crates[#Crates + 1] = {
+--             Coords = Location,
+--             NetId = CrateNetid,
+--             Opened = false
+--         }
+--     end
 
-    return Crates
-end
+--     return Crates
+-- end
 
-local function SetupCrates()
-    for i = 1, #Heist.Crates do
-        local CrateData = Heist.Crates[i]
+-- local function SetupCrates()
+--     for i = 1, #Heist.Crates do
+--         local CrateData = Heist.Crates[i]
 
-        local Blip = CreateBlip({ Coords = Config.Crates.Locations[CrateData.Coords], Label = 'Crate', Sprite = 478, Color = 2, Scale = 0.5, ShortRange = false })
+--         local Blip = CreateBlip({ Coords = Config.Crates.Locations[CrateData.Coords], Label = 'Crate', Sprite = 478, Color = 2, Scale = 0.5, ShortRange = false })
 
-        Blips.Crates[i] = Blip
+--         Blips.Crates[i] = Blip
 
-        Target:addEntity(CrateData.NetId, {
-            label = 'Åben Kasse',
-            name = 'humane_heist_crate_' .. i,
-            icon = 'fa-solid fa-box',
-            distance = 2.5,
-            canInteract = function()
-                return not Heist.Crates[i].Opened
-            end,
-            onSelect = function(Data)
-                TriggerEvent('ox_inventory:disarm', true)
-                Jet.Scenes.OpenCrate(Data.entity, function()
+--         Target:addEntity(CrateData.NetId, {
+--             label = 'Åben Kasse',
+--             name = 'humane_heist_crate_' .. i,
+--             icon = 'fa-solid fa-box',
+--             distance = 2.5,
+--             canInteract = function()
+--                 return not Heist.Crates[i].Opened
+--             end,
+--             onSelect = function(Data)
+--                 TriggerEvent('ox_inventory:disarm', true)
+--                 Jet.Scenes.OpenCrate(Data.entity, function()
 
-                end)
-            end
-        })
-    end
-end
+--                 end)
+--             end
+--         })
+--     end
+-- end
 
 Jet.Callback.Register('mani-humaneheist:client:SetupHeist', function()
     local Grills = CreateGrill()
     local Readers = CreateReaders()
     local Chemicals = CreateChemicals()
     local Keypads = CreateKeypads()
-    local Crates = CreateCrates()
+    -- local Crates = CreateCrates()
 
     return {
         Grills = Grills,
         Readers = Readers,
         Chemicals = Chemicals,
-        Keypads = Keypads,
-        Crates = Crates
+        Keypads = Keypads
     }
 end)
 
@@ -458,7 +457,7 @@ RegisterNetEvent('mani-humaneheist:client:StartHeist', function(HeistData)
 
     SetupKeypads()
 
-    SetupCrates()
+    -- SetupCrates()
 
     Target:addSphereZone({
         coords = vec3(3536.08, 3658.97, 28.12),
@@ -491,78 +490,13 @@ RegisterNetEvent('mani-humaneheist:client:StartHeist', function(HeistData)
     SetupGuards()
 end)
 
-local function OpenHeistMenu()
-    local Success, Error = Jet.Callback.Await('mani-humaneheist:server:HeistData', false)
-    if not Success then Jet.Notify({ title = 'Fejl', description = Error, type = 'error' } ) return end
-
-    -- local Confirm = lib.alertDialog({
-    --     header = 'Start Heist',
-    --     content = 'Kræver:  \n Hacking Device  \n Adgangskort  \n \n Er du sikker på du vil starte heistet?',
-    --     centered = true,
-    --     cancel = true
-    -- })
-
-    local Confirm = 'confirm'
-
-    if Confirm == 'confirm' then
-        Success = Jet.Callback.Await('mani-humaneheist:server:HeistDistance', false)
-        if not Success then Jet.Notify({ title = 'Cooldown', description = 'Humane Labs er allerede blevet røvet.', type = 'error' } ) return end
-        Jet.Notify({ title = 'Heist Startet', description = 'Gå til Humane Labs og begynd heistet', type = 'success' } )
-    end
+local function StartHeist()
+    local Response = Jet.Callback.Await('mani-humaneheist:server:HeistDistance', false)
+    if not Response.Success then Jet.Notify({ title = 'Cooldown', description = Response.Message, type = 'error' } ) return false end
+    Jet.Notify({ title = 'Heist Startet', description = 'Gå til Humane Labs og begynd heistet', type = 'success' } )
 end
 
-if Config.Debug then OpenHeistMenu() end
-
-CreateThread(function()
-    for ConfigDoor = 1, #Config.Doors do
-        local Door = Config.Doors[ConfigDoor]
-        Doors[Door.Key] = {}
-        if Door.Double then
-            for DoorIndex = 1, #Door.Double do
-                local SubDoor = Door.Double[DoorIndex]
-                SubDoor.Hash = GetHashKey(('mani_humane_%s_%d'):format(Door.Key, DoorIndex))
-                AddDoorToSystem(SubDoor.Hash, SubDoor.Model, SubDoor.Coords.x, SubDoor.Coords.y, SubDoor.Coords.z, false, false, false)
-                DoorSystemSetDoorState(SubDoor.Hash, 1, false, false)
-                Doors[Door.Key][#Doors[Door.Key] + 1] = SubDoor.Hash
-            end
-        else
-            Door.Hash = GetHashKey(('mani_humane_%s'):format(Door.Key))
-            AddDoorToSystem(Door.Hash, Door.Model, Door.Coords.x, Door.Coords.y, Door.Coords.z, false, false, false)
-            DoorSystemSetDoorState(Door.Hash, 1, false, false)
-            Doors[Door.Key][1] = Door.Hash
-        end
-    end
-
-    local NPCModel = GetHashKey(Config.NPC.Model)
-    local NPCCoords = Config.NPC.Coords
-
-    Jet.Points.New({
-        coords = NPCCoords,
-        distance = 75,
-        onEnter = function(self)
-            Jet.Request.Model(NPCModel)
-            local NPC = CreatePed(4, NPCModel, NPCCoords.x, NPCCoords.y, NPCCoords.z, NPCCoords.w, false, true)
-            FreezeEntityPosition(NPC, true)
-            SetEntityInvincible(NPC, true)
-            SetBlockingOfNonTemporaryEvents(NPC, true)
-
-            SetModelAsNoLongerNeeded(NPCModel)
-
-            self.NPC = NPC
-
-            Target:addLocalEntity(NPC, {
-                label = 'Humane Heist',
-                icon = 'fa-solid fa-briefcase',
-                distance = 2.5,
-                onSelect = OpenHeistMenu,
-            })
-        end,
-        onExit = function(self)
-            Target:removeLocalEntity(self.NPC)
-            DeleteEntity(self.NPC)
-        end
-    })
-end)
+exports('StartHeist', StartHeist)
 
 RegisterNetEvent('mani-humaneheist:client:HackKeypad', function(HeistData, Index)
     Heist = HeistData
@@ -609,10 +543,10 @@ RegisterNetEvent('mani-humaneheist:client:UnlockDoor', function(Key)
     end
 end)
 
-RegisterNetEvent('w', function()
+RegisterNetEvent('mani-humaneheist:client:SetupBlip', function()
     local Coords = vec3(3832.85, 3665.67, -23.0)
-    local Blip = CreateBlip({ Coords = Coords })
-    
+    local Blip = CreateBlip({ Coords = Coords, Label = 'Humane Heist', Sprite = 499, Color = 1, Scale = 0.8 })
+
     SetBlipRoute(Blip, true)
 
     CreateThread(function()
@@ -631,5 +565,26 @@ AddEventHandler('onResourceStop', function(resourceName)
 
     for i = 1, #Objects do
         DeleteObject(Objects[i])
+    end
+end)
+
+CreateThread(function()
+    for ConfigDoor = 1, #Config.Doors do
+        local Door = Config.Doors[ConfigDoor]
+        Doors[Door.Key] = {}
+        if Door.Double then
+            for DoorIndex = 1, #Door.Double do
+                local SubDoor = Door.Double[DoorIndex]
+                SubDoor.Hash = GetHashKey(('mani_humane_%s_%d'):format(Door.Key, DoorIndex))
+                AddDoorToSystem(SubDoor.Hash, SubDoor.Model, SubDoor.Coords.x, SubDoor.Coords.y, SubDoor.Coords.z, false, false, false)
+                DoorSystemSetDoorState(SubDoor.Hash, 1, false, false)
+                Doors[Door.Key][#Doors[Door.Key] + 1] = SubDoor.Hash
+            end
+        else
+            Door.Hash = GetHashKey(('mani_humane_%s'):format(Door.Key))
+            AddDoorToSystem(Door.Hash, Door.Model, Door.Coords.x, Door.Coords.y, Door.Coords.z, false, false, false)
+            DoorSystemSetDoorState(Door.Hash, 1, false, false)
+            Doors[Door.Key][1] = Door.Hash
+        end
     end
 end)
